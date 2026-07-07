@@ -129,7 +129,7 @@
             max-width: 1400px;
             width: 100%;
             display: grid;
-            grid-template-columns: 1fr 380px;
+            grid-template-columns: 1fr 480px;
             gap: 24px;
             background: rgba(16, 21, 28, 0.85);
             backdrop-filter: blur(12px);
@@ -300,20 +300,17 @@
             border-collapse: collapse;
             font-size: 12px;
             font-family: 'Courier New', monospace;
-            table-layout: fixed;
+            table-layout: auto;
         }
 
         .matrix-table th,
         .matrix-table td {
-            padding: 4px 6px;
+            padding: 4px 8px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            width: 36px;
-            max-width: 36px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            min-width: 46px;
+            font-size: 12px;
             white-space: nowrap;
-            font-size: 11px;
         }
 
         .matrix-table th {
