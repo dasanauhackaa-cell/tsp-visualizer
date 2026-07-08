@@ -137,7 +137,9 @@ body {
 
 @media (max-width: 900px) {
     .container {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: 1fr 480px;
+        gap: 24px;
     }
 }
 
@@ -164,7 +166,7 @@ h1 span {
     font-size: 13px;
 }
 
-/* ТУЛБАР */
+/* ТУЛБАР (панель инструментов)*/
 .toolbar {
     display: flex;
     flex-wrap: wrap;
@@ -203,11 +205,63 @@ h1 span {
     font-size: 13px;
 }
 
+.toolbar select {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #E6E9EF;
+    padding: 7px 30px 7px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #4E5867 50%),
+        linear-gradient(135deg, #4E5867 50%, transparent 50%);
+    background-position: calc(100% - 11px) center, calc(100% - 6px) center;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    min-width: 140px;
+}
+
+/* ИКОНКА-ПОДСКАЗКА РЯДОМ С ЗАГОЛОВКОМ */
+.tsp-tip {
+    display: inline-block;
+    font-size: 18px;
+    color: #7C8798;
+    cursor: help;
+    margin-left: 8px;
+    transition: all 0.3s ease;
+    font-weight: 400;
+}
+
+.tsp-tip:hover {
+    color: #4CC9F0;
+    transform: scale(1.2);
+}
+
+.toolbar select:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.toolbar select:focus {
+    outline: none;
+    border-color: rgba(76, 201, 240, 0.4);
+    box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.1);
+}
+
+.toolbar select option {
+    background: #161B22;
+    color: #E6E9EF;
+}
+
 .toolbar .counter strong {
     color: #E6E9EF;
 }
 
-/* CANVAS */
+/* CANVAS (карта) */
 canvas {
     width: 100%;
     height: auto;
@@ -228,6 +282,7 @@ canvas {
     text-align: center;
 }
 
+/* СТРОКА СТАТУСА*/
 .status {
     padding: 10px 14px;
     border-radius: 8px;
@@ -246,6 +301,38 @@ canvas {
 }
 .status .error {
     color: #F2545B;
+}
+.status .ok {
+    color :#4ADE80;
+}
+
+/* СВОДКА ПО НАЙДЕННОМУ МАРШРУТУ (НОВОЕ) */
+.route-summary {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(74, 222, 128, 0.06);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    font-size: 13px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+}
+
+.route-summary-algo {
+    color: #4CC9F0;
+    font-weight: 600;
+}
+
+.route-summary-dist strong {
+    color: #4ADE80;
+    font-size: 15px;
+}
+
+.route-summary-time {
+    color: #7C8798;
+    font-size: 12px;
+    margin-left: auto;
 }
 
 /* ПРАВАЯ КОЛОНКА — МАТРИЦА */
@@ -290,6 +377,33 @@ canvas {
     overflow-y: auto;
     max-height: 400px;
     max-width: 100%;
+}
+
+/* ТЁМНЫЙ СКРОЛЛ ДЛЯ МАТРИЦЫ */
+.matrix-wrapper::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.matrix-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
+}
+
+.matrix-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.matrix-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Firefox */
+.matrix-wrapper {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.12) rgba(255, 255, 255, 0.04);
 }
 
 .matrix-table {
