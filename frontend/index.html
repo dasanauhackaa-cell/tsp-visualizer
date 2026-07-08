@@ -14,13 +14,28 @@
     <div class="container">
         <div class="left">
             <div>
-                <h1>🗺️ TSP <span>Визуализатор</span></h1>
-                <p class="subtitle">Кликни по карте, чтобы поставить город · справа матрица расстояний</p>
+                <h1>
+                    🗺️ <span>TSP Визуализатор</span>
+                     <span class="tsp-tip" title="TSP (Traveling Salesman Problem) — задача коммивояжёра. Это классическая задача комбинаторной оптимизации, суть которой заключается в поиске самого короткого маршрута, проходящего через заданные города по одному разу с возвратом в исходный.
+                Алгоритмы:
+                • Жадный — на каждом шаге идёт в ближайший непосещённый город. Быстро, но не всегда оптимально.
+                • Муравьиный — имитирует муравьёв: муравьи испускают больше феромона на короткие пути, привлекая следующих муравьёв. Хороший баланс скорости и качества.
+                • Полный перебор — проверяет все возможные маршруты и выбирает лучший. Самый точный, но только для ≤10 городов. Очень медленный.
+                • Ветви и границы — умный перебор: отсекает заведомо плохие ветки. Точно, но только для ≤10 городов. Быстрее полного перебора.">ⓘ</span>                </h1>
             </div>
 
             <div class="toolbar">
                 <button id="clearBtn" class="danger">🗑 Очистить</button>
                 <button id="randomBtn">🎲 5 случайных</button>
+
+                    <!--  ВЫБОР АЛГОРИТМА И ЗАПУСК  -->
+                    <select id="algoSelect">
+                        <option value="greedy">Жадный (быстро)</option>
+                        <option value="ant">Муравьиный (эвристика)</option>
+                        <option value="branch_and_bound">Ветви и границы (точно, ≤10)</option>
+                        <option value="bruteforce">Полный перебор (точно, ≤10)</option>
+                    </select>
+                    <button id="solveBtn" class="primary">🚀 Найти маршрут</button>
                 <span class="counter">Городов: <strong id="cityCount">0</strong></span>
             </div>
 
@@ -31,9 +46,15 @@
             <div class="status" id="status">
                 <span>💡</span> Кликни на карту, чтобы поставить первый город
             </div>
-        </div>
 
+        </div>
         <div class="right">
+             <!-- СВОДКА ПО МАРШРУТУ -->
+            <div class="route-summary" id="routeSummary" style="display:none;">
+                <span class="route-summary-algo" id="routeAlgo">—</span>
+                <span class="route-summary-dist">Длина: <strong id="routeDistance">—</strong></span>
+                <span class="route-summary-time" id="routeTime"></span>
+            </div>
             <div class="matrix-container">
                 <h2>
                     📊 Матрица расстояний
@@ -50,7 +71,6 @@
                 </div>
             </div>
         </div>
-
     </div>
     <script src="script.js"></script>
 </body>

@@ -2,8 +2,12 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const statusEl = document.getElementById('status');
-let cities = [];
 
+let cities = [];
+let route = null;    //найденный маршрут
+let solving = false; //блокировка во время расчёта
+
+const API_BASE = 'http://localhost:8000';
 const CELL_SIZE = 40;
 
 // РАССТОЯНИЕ (в клетках)
@@ -30,6 +34,22 @@ function draw() {
         ctx.moveTo(0, y);
         ctx.lineTo(800, y);
         ctx.stroke();
+    }
+
+    // НОВОЕ: РИСУЕМ МАРШРУТ
+    if (route && route.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(cities[route[0]].x, cities[route[0]].y);
+        for (let i = 1; i < route.length; i++) {
+            ctx.lineTo(cities[route[i]].x, cities[route[i]].y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = '#4ADE80';
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = 'rgba(74, 222, 128, 0.4)';
+        ctx.shadowBlur = 12;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
     }
 
     cities.forEach((city, i) => {
@@ -102,8 +122,15 @@ function renderMatrix() {
     totalEl.textContent = total.toFixed(2);
 }
 
+// СКРЫТЬ СВОДКУ ПО МАРШРУТУ
+function hideRouteSummary() {
+    route = null;
+    document.getElementById('routeSummary').style.display = 'none';
+}
+
 // СОБЫТИЯ
 canvas.addEventListener('click', (e) => {
+    if (solving) return;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
@@ -119,6 +146,7 @@ canvas.addEventListener('click', (e) => {
 
 document.getElementById('clearBtn').onclick = () => {
     cities = [];
+    hideRouteSummary();
     draw();
     statusEl.innerHTML = `<span>🗑</span> Все города удалены`;
 };
@@ -131,6 +159,7 @@ document.getElementById('randomBtn').onclick = () => {
             y: 60 + Math.random() * 480
         });
     }
+    hideRouteSummary();
     draw();
     statusEl.innerHTML = `<span class="info">🎲</span> Сгенерировано 5 случайных городов`;
 };
@@ -175,6 +204,73 @@ function createBgCities() {
         container.appendChild(el);
     }
 }
+
+document.getElementById('solveBtn').onclick = async () => {
+    if (solving) return;
+
+    if (cities.length < 3) {
+        statusEl.innerHTML = `<span class="error">❌</span> Нужно минимум 3 города!`;
+        return;
+    }
+
+    const algorithm = document.getElementById('algoSelect').value;
+    const HEAVY_ALGO_LIMIT = 10;
+
+    if ((algorithm === 'bruteforce' || algorithm === 'branch_and_bound') && cities.length > HEAVY_ALGO_LIMIT) {
+        statusEl.innerHTML = `<span class="error">❌</span> Для этого алгоритма максимум ${HEAVY_ALGO_LIMIT} городов (сейчас ${cities.length})`;
+        return;
+    }
+
+    solving = true;
+    const btn = document.getElementById('solveBtn');
+    btn.textContent = '⏳ Считаю...';
+    btn.disabled = true;
+    statusEl.innerHTML = `<span>⏳</span> Отправка запроса на бэкенд...`;
+
+    try {
+        const res = await fetch(`${API_BASE}/solve`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cities, algorithm })
+        });
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || `Ошибка сервера: ${res.status}`);
+        }
+
+        const data = await res.json();
+        route = data.order;
+        draw();
+
+        statusEl.innerHTML = `<span class="ok">✅</span> Маршрут найден!`;
+
+        const algoNames = {
+            greedy: 'Жадный алгоритм',
+            ant: 'Муравьиный алгоритм',
+            bruteforce: 'Полный перебор',
+            branch_and_bound: 'Ветви и границы'
+        };
+        document.getElementById('routeAlgo').textContent = algoNames[data.algorithm] || data.algorithm;
+        const totalDistanceInCells = data.total_distance / CELL_SIZE;
+        document.getElementById('routeDistance').textContent = totalDistanceInCells.toFixed(2);
+        document.getElementById('routeTime').textContent =
+            `${data.time_ms.toFixed(1)} мс` + (data.checked != null ? ` · проверено ${data.checked}` : '');
+        document.getElementById('routeSummary').style.display = 'flex';
+
+        if (data.truncated) {
+            statusEl.innerHTML = `<span class="error">⚠️</span> ${data.note_global || 'Поиск прерван по таймеру — маршрут может быть не оптимальным'}`;
+        }
+
+    } catch (err) {
+        statusEl.innerHTML = `<span class="error">❌</span> Ошибка: ${err.message}`;
+    }
+
+    solving = false;
+    btn.textContent = '🚀 Найти маршрут';
+    btn.disabled = false;
+};
+
 createBgCities();
 
 const glow = document.getElementById('mouseGlow');
