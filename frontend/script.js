@@ -245,6 +245,9 @@ document.getElementById('solveBtn').onclick = async () => {
 
         statusEl.innerHTML = `<span class="ok">✅</span> Маршрут найден!`;
 
+        const orderStr = data.order.map(idx => idx + 1).join(' → ');
+        document.getElementById('routeOrder').textContent = `Маршрут: ${orderStr}`;
+        
         const algoNames = {
             greedy: 'Жадный алгоритм',
             ant: 'Муравьиный алгоритм',
