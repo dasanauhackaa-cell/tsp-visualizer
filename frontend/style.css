@@ -335,6 +335,16 @@ canvas {
     margin-left: auto;
 }
 
+.route-summary-order {
+    width: 100%;
+    color: #7C8798;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+    padding-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    margin-top: 4px;
+}
+
 /* ПРАВАЯ КОЛОНКА — МАТРИЦА */
 .right {
     display: flex;
